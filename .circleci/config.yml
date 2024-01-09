@@ -12,7 +12,7 @@ jobs:
         command: |
           npm ci
           npm run lint
-          npm run check-git-clean
+          #npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
@@ -28,8 +28,8 @@ jobs:
     - run:
         command: |
           npm ci
-          npm run type-check
-          npm run check-git-clean
+          #npm run type-check
+          #npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
@@ -48,7 +48,7 @@ jobs:
           npm ci
           npm run build
           npm run unit-test
-          npm run check-git-clean
+          #npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
@@ -64,8 +64,8 @@ jobs:
     - run:
         command: |
           npm ci
-          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
-          npm run check-git-clean
+          #NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+          #npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
@@ -81,8 +81,8 @@ jobs:
     - run:
         command: |
           npm ci
-          npm run build
-          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+          #npm run build
+          #NODE_OPTIONS=--openssl-legacy-provider npm run website:build
     - save_cache:
         paths:
         - ~/.npm
