@@ -1,0 +1,122 @@
+version: 2.1
+jobs:
+  lint:
+    docker:
+    - image: cimg/node:12.16
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+    - run:
+        command: |
+          npm ci
+          npm run lint
+          npm run check-git-clean
+    - save_cache:
+        paths:
+        - ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+  type-check:
+    docker:
+    - image: cimg/node:12.16
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+    - run:
+        command: |
+          npm ci
+          npm run type-check
+          npm run check-git-clean
+    - save_cache:
+        paths:
+        - ~/.npm
+        - ~/.dts
+        key: ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+  unit-test:
+    docker:
+    - image: cimg/node:12.16
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+    - run:
+        command: |
+          npm ci
+          npm run build
+          npm run unit-test
+          npm run check-git-clean
+    - save_cache:
+        paths:
+        - ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+  website:
+    docker:
+    - image: cimg/node:12.16
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+    - run:
+        command: |
+          npm ci
+          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+          npm run check-git-clean
+    - save_cache:
+        paths:
+        - ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+  publish:
+    docker:
+    - image: cimg/node:12.16
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+    - run:
+        command: |
+          npm ci
+          npm run build
+          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+    - save_cache:
+        paths:
+        - ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles(**/package-lock.json) }}
+workflows:
+  CI:
+    jobs:
+    - lint:
+        filters:
+          branches:
+            only:
+              - main
+    - type-check:
+        filters:
+          branches:
+            only:
+              - main
+    - unit-test:
+        filters:
+          branches:
+            only:
+              - main
+    - website:
+        filters:
+          branches:
+            only:
+              - main
+    - publish:
+        filters:
+          branches:
+            only:
+              - main
+        requires:
+          - lint
+          - type-check
+          - unit-test
+          - website
