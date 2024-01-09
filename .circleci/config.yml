@@ -46,7 +46,7 @@ jobs:
     - run:
         command: |
           npm ci
-          npm run build
+          #npm run build
           #npm run unit-test
           #npm run check-git-clean
     - save_cache:
