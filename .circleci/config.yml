@@ -7,16 +7,16 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        -  v1-dependencies-{{ checksum "package.json" }} 
+        - node-{{ checksum "**/package-lock.json" }}
     - run:
         command: |
           npm ci
           npm run lint
-          #npm run check-git-clean
+          npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
-        key:  v1-dependencies-{{ checksum "package.json" }}
+        key: node-{{ checksum "**/package-lock.json" }}
   type-check:
     docker:
     - image: cimg/node:12.16
@@ -24,17 +24,17 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        -  v1-dependencies-{{ checksum "package.json" }} 
+        - node-{{ checksum "**/package-lock.json" }}
     - run:
         command: |
           npm ci
-          #npm run type-check
-          #npm run check-git-clean
+          npm run type-check
+          npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
         - ~/.dts
-        key:  v1-dependencies-{{ checksum "package.json" }}
+        key: node-{{ checksum "**/package-lock.json" }}
   unit-test:
     docker:
     - image: cimg/node:12.16
@@ -42,17 +42,17 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        -  v1-dependencies-{{ checksum "package.json" }} 
+        - node-{{ checksum "**/package-lock.json" }}
     - run:
         command: |
           npm ci
-          #npm run build
-          #npm run unit-test
-          #npm run check-git-clean
+          npm run build
+          npm run unit-test
+          npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
-        key:  v1-dependencies-{{ checksum "package.json" }}
+        key: node-{{ checksum "**/package-lock.json" }}
   website:
     docker:
     - image: cimg/node:12.16
@@ -60,16 +60,16 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        -  v1-dependencies-{{ checksum "package.json" }} 
+        - node-{{ checksum "**/package-lock.json" }}
     - run:
         command: |
           npm ci
-          #NODE_OPTIONS=--openssl-legacy-provider npm run website:build
-          #npm run check-git-clean
+          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+          npm run check-git-clean
     - save_cache:
         paths:
         - ~/.npm
-        key:  v1-dependencies-{{ checksum "package.json" }}
+        key: node-{{ checksum "**/package-lock.json" }}
   publish:
     docker:
     - image: cimg/node:12.16
@@ -77,16 +77,16 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        -  v1-dependencies-{{ checksum "package.json" }} 
+        - node-{{ checksum "**/package-lock.json" }}
     - run:
         command: |
           npm ci
-          #npm run build
-          #NODE_OPTIONS=--openssl-legacy-provider npm run website:build
+          npm run build
+          NODE_OPTIONS=--openssl-legacy-provider npm run website:build
     - save_cache:
         paths:
         - ~/.npm
-        key:  v1-dependencies-{{ checksum "package.json" }}
+        key: node-{{ checksum "**/package-lock.json" }}
 workflows:
   CI:
     jobs:
@@ -94,29 +94,29 @@ workflows:
         filters:
           branches:
             only:
-              - main
+            - main
     - type-check:
         filters:
           branches:
             only:
-              - main
+            - main
     - unit-test:
         filters:
           branches:
             only:
-              - main
+            - main
     - website:
         filters:
           branches:
             only:
-              - main
+            - main
     - publish:
         filters:
           branches:
             only:
-              - main
+            - main
         requires:
-          - lint
-          - type-check
-          - unit-test
-          - website
+        - lint
+        - type-check
+        - unit-test
+        - website
